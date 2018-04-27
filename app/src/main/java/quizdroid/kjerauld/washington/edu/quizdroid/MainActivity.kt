@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,15 +31,15 @@ class MainActivity : AppCompatActivity() {
                     "What is 9 x 9?",
                     "What is 5/1?"
             ), arrayListOf<String>(
-                    "Which of the following is not a type of energy?",
-                    "Which of these is a unit of work?",
-                    "Which of Newton's Laws states that every action has an equal and opposite reaction?"
-            ), arrayListOf<String>(
-                    "Which Hero has the top grossing solo film of all time?",
-                    "What is the name of the upcoming Avengers Movie?",
-                    "Which hero has the power to fly?",
-                    "Where is Black Panther from?"
-            )
+            "Which of the following is not a type of energy?",
+            "Which of these is a unit of work?",
+            "Which of Newton's Laws states that every action has an equal and opposite reaction?"
+    ), arrayListOf<String>(
+            "Which Hero has the top grossing solo film of all time?",
+            "What is the name of the upcoming Avengers Movie?",
+            "Which hero has the power to fly?",
+            "Where is Black Panther from?"
+    )
     )
 
     val lengths = arrayOf(
@@ -55,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         listView.adapter = myCustomAdapter(this)
 
         listView.setOnItemClickListener{ parent, view, position, id ->
-            val intent = Intent(this, QuizTopicActivity01::class.java)
+            val intent = Intent(this, SecondaryActivity::class.java)
             intent.putExtra("Title",titles[position])
             intent.putExtra("Description", descriptions[position])
             intent.putExtra("Length", lengths[position].toString())
