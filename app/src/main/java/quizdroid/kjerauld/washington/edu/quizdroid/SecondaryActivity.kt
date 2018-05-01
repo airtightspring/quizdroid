@@ -8,26 +8,20 @@ import android.widget.Button
 
 class SecondaryActivity : FragmentActivity() {
 
-    // getting data
-
     var isFragmentOneLoaded = true
     val manager = fragmentManager
+
+    val app = QuizApp.Companion
+    val topics = app.getTopics()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_secondary)
 
-        val passedTitle = intent.getStringExtra("Title")
-        val passedDescription = intent.getStringExtra("Description")
-        val passedLength = intent.getStringExtra("Length")
-        val passedQuestions = intent.getStringArrayListExtra("QuestionList")
+
         val pos = intent.getStringExtra("Pos")
 
         val bundler: Bundle = Bundle()
-            bundler.putString("Title", passedTitle)
-            bundler.putString("Description", passedDescription)
-            bundler.putString("Length", passedLength)
-            bundler.putStringArrayList("QuestionList", passedQuestions)
             bundler.putString("Pos", pos)
 
 

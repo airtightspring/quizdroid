@@ -21,53 +21,12 @@ class QuestionFragment : Fragment() {
     var cNumber = 0
     var answerKey = IntArray(0)
 
-    val answers = arrayListOf<ArrayList<ArrayList<String>>>(
-            arrayListOf<ArrayList<String>>(
-                    arrayListOf<String>(
-                            "3.5x", "7x", "3.5x","7","7"
-                    ),
-                    arrayListOf<String>(
-                            "52", "81", "36", "18", "81"
-                    ),
-                    arrayListOf<String>(
-                            "5", "1", "10", "42", "5"
-                    )
-            ),
-            arrayListOf<ArrayList<String>>(
-                    arrayListOf<String>(
-                            "Kinetic", "Wooden", "Thermal", "Potential", "Wooden"
-                    ),
-                    arrayListOf<String>(
-                            "Watt", "Meter", "Joule", "Newton", "Joule"
-                    ),
-                    arrayListOf<String>(
-                            "First", "Second", "Third", "Fourth", "Third"
-                    )
-            ),
-            arrayListOf<ArrayList<String>>(
-                    arrayListOf<String>(
-                            "Iron Man", "Captain America", "Black Panther", "Thor", "Black Panther"
-                    ),
-                    arrayListOf<String>(
-                            "Age of Ultron", "War of Thanos", "Battle for Earth", "Infinity War", "Infinity War"
-                    ),
-                    arrayListOf<String>(
-                            "Vision", "Hawkeye", "Black Widow", "Captain America", "Vision"
-                    ),
-                    arrayListOf<String>(
-                            "Kenya", "Ethiopia", "Azerbaijan", "Wakanda", "Wakanda"
-                    )
-            )
-    )
-
+    val app = QuizApp.Companion
+    val topics = app.getTopics()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            title = arguments.getString("Title")
-            description = arguments.getString("Description")
-            length = arguments.getString("Length")
-            questionList.addAll(arguments.getStringArrayList("QuestionList"))
             pos = arguments.getString("Pos").toInt()
             cNumber = arguments.getInt("cNumber")
             qNumber = arguments.getInt("qNumber")
@@ -85,7 +44,7 @@ class QuestionFragment : Fragment() {
         submit.setEnabled(false)
 
         val questionDisplay: TextView = view.findViewById(R.id.textView4)
-        questionDisplay.text = questionList[qNumber]
+        questionDisplay.text = topics[pos].questions[qNumber].question
 
         if(answerKey[qNumber] == 1) {
             cNumber = cNumber - 1
@@ -94,28 +53,28 @@ class QuestionFragment : Fragment() {
 
 
         val radio01: RadioButton = view.findViewById(R.id.radioButton)
-        radio01.text = answers[pos.toInt()][qNumber][0].toString()
+        radio01.text =  topics[pos].questions[qNumber].answers[0]
         radio01.setOnClickListener() {
             aNumber = 0
             submit.setEnabled(true)
         }
 
         val radio02: RadioButton = view.findViewById(R.id.radioButton2)
-        radio02.text = answers[pos.toInt()][qNumber][1].toString()
+        radio02.text = topics[pos].questions[qNumber].answers[1]
         radio02.setOnClickListener() {
             aNumber = 1
             submit.setEnabled(true)
         }
 
         val radio03: RadioButton = view.findViewById(R.id.radioButton3)
-        radio03.text = answers[pos.toInt()][qNumber][2].toString()
+        radio03.text = topics[pos].questions[qNumber].answers[2]
         radio03.setOnClickListener() {
             aNumber = 2
             submit.setEnabled(true)
         }
 
         val radio04: RadioButton = view.findViewById(R.id.radioButton4)
-        radio04.text = answers[pos.toInt()][qNumber][3].toString()
+        radio04.text = topics[pos].questions[qNumber].answers[3]
         radio04.setOnClickListener() {
             aNumber = 3
             submit.setEnabled(true)
@@ -124,10 +83,6 @@ class QuestionFragment : Fragment() {
 
         submit.setOnClickListener(){
             val bundler: Bundle = Bundle()
-            bundler.putString("Title", title)
-            bundler.putString("Description", description)
-            bundler.putString("Length", length)
-            bundler.putStringArrayList("QuestionList", questionList)
             bundler.putString("Pos", pos.toString())
             bundler.putInt("aNumber", aNumber)
             bundler.putInt("qNumber", qNumber)
@@ -147,10 +102,6 @@ class QuestionFragment : Fragment() {
                 aNumber = 0
 
                 val bundler: Bundle = Bundle()
-                bundler.putString("Title", title)
-                bundler.putString("Description", description)
-                bundler.putString("Length", length)
-                bundler.putStringArrayList("QuestionList", questionList)
                 bundler.putString("Pos", pos.toString())
                 bundler.putInt("aNumber", aNumber)
                 bundler.putInt("qNumber", qNumber)

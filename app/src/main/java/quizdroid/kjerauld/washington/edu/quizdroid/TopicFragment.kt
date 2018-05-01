@@ -8,31 +8,22 @@ import android.view.ViewGroup;
 import android.widget.Button
 import android.widget.TextView
 
-
-
-
-
 class TopicFragment : Fragment() {
 
-    var title = ""
-    var description = ""
-    var length = ""
-    var questionList: ArrayList<String> = ArrayList<String>()
+
     var pos = 0
     var cNumber = 0
     var qNumber = 0
     var answerKey = IntArray(0)
 
+    val app = QuizApp.Companion
+    val topics = app.getTopics()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            title = arguments.getString("Title")
-            description = arguments.getString("Description")
-            length = arguments.getString("Length")
-            questionList = arguments.getStringArrayList("QuestionList")
             pos = arguments.getString("Pos").toInt()
-            answerKey = IntArray(questionList.size)
         }
     }
 
@@ -42,25 +33,23 @@ class TopicFragment : Fragment() {
         val view = inflater?.inflate(R.layout.fragment_topic,
         container, false) as View
 
+        answerKey = IntArray(topics[pos].questions.size)
+
         // Inflate the layout for this fragment
         val titleBox: TextView = view.findViewById(R.id.textView)
-        titleBox.text = title
+        titleBox.text = topics[pos].title
 
         val descriptionBox: TextView = view.findViewById(R.id.textView2)
-        descriptionBox.text = description
+        descriptionBox.text = topics[pos].longDesc
 
         val lengthBox: TextView = view.findViewById(R.id.textView3)
-        val lengthString = questionList.size.toString() + " Questions"
+        val lengthString = topics[pos].questions.size.toString() + " Questions"
         lengthBox.text = lengthString
 
         val startButton: Button = view.findViewById(R.id.button)
         startButton.text = "Start"
 
         val bundler: Bundle = Bundle()
-        bundler.putString("Title", title)
-        bundler.putString("Description", description)
-        bundler.putString("Length", length)
-        bundler.putStringArrayList("QuestionList", questionList)
         bundler.putString("Pos", pos.toString())
         bundler.putInt("cNumber", cNumber)
         bundler.putInt("qNumber", qNumber)

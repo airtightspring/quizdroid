@@ -10,63 +10,18 @@ import android.widget.TextView
 
 
 class AnswerFragment : Fragment() {
-    var title = ""
-    var description = ""
-    var length = ""
-    var questionList: ArrayList<String> = ArrayList<String>()
     var pos = 0
     var qNumber = 0
     var aNumber = 0
     var cNumber = 0
     var answerKey = IntArray(0)
 
-    val answers = arrayListOf<ArrayList<ArrayList<String>>>(
-            arrayListOf<ArrayList<String>>(
-                    arrayListOf<String>(
-                            "3.5x", "7x", "3.5x","7","7"
-                    ),
-                    arrayListOf<String>(
-                            "52", "81", "36", "18", "81"
-                    ),
-                    arrayListOf<String>(
-                            "5", "1", "10", "42", "5"
-                    )
-            ),
-            arrayListOf<ArrayList<String>>(
-                    arrayListOf<String>(
-                            "Kinetic", "Wooden", "Thermal", "Potential", "Wooden"
-                    ),
-                    arrayListOf<String>(
-                            "Watt", "Meter", "Joule", "Newton", "Joule"
-                    ),
-                    arrayListOf<String>(
-                            "First", "Second", "Third", "Fourth", "Third"
-                    )
-            ),
-            arrayListOf<ArrayList<String>>(
-                    arrayListOf<String>(
-                            "Iron Man", "Captain America", "Black Panther", "Thor", "Black Panther"
-                    ),
-                    arrayListOf<String>(
-                            "Age of Ultron", "War of Thanos", "Battle for Earth", "Infinity War", "Infinity War"
-                    ),
-                    arrayListOf<String>(
-                            "Vision", "Hawkeye", "Black Widow", "Captain America", "Vision"
-                    ),
-                    arrayListOf<String>(
-                            "Kenya", "Ethiopia", "Azerbaijan", "Wakanda", "Wakanda"
-                    )
-            )
-    )
-
+    val app = QuizApp.Companion
+    val topics = app.getTopics()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            title = arguments.getString("Title")
-            description = arguments.getString("Description")
-            length = arguments.getString("Length")
-            questionList.addAll(arguments.getStringArrayList("QuestionList"))
             pos = arguments.getString("Pos").toInt()
             aNumber = arguments.getInt("aNumber")
             qNumber = arguments.getInt("qNumber")
@@ -81,19 +36,19 @@ class AnswerFragment : Fragment() {
         val view = inflater?.inflate(R.layout.fragment_answer,
                 container, false) as View
 
-        if (answers[pos.toInt()][qNumber][aNumber] == answers[pos.toInt()][qNumber][4]) {
+        if (aNumber == topics[pos].questions[qNumber].correctAnswer) {
             cNumber = cNumber + 1
             answerKey[qNumber] = 1
         }
 
         val yourAnswer: TextView = view.findViewById(R.id.textView5)
-        yourAnswer.text = "Correct Answer: " + answers[pos.toInt()][qNumber][4]
+        yourAnswer.text = "Correct Answer: " + topics[pos].questions[qNumber].answers[topics[pos].questions[qNumber].correctAnswer]
         val correctAnswer: TextView = view.findViewById(R.id.textView7)
-        correctAnswer.text = "Your Answer: " + answers[pos.toInt()][qNumber][aNumber]
+        correctAnswer.text = "Your Answer: " + topics[pos].questions[qNumber].answers[aNumber]
         val correctDisplay: TextView = view.findViewById(R.id.textView6)
-        correctDisplay.text = cNumber.toString() + "/" +  questionList.size + " Correct"
+        correctDisplay.text = cNumber.toString() + "/" +  topics[pos].questions.size.toString() + " Correct"
         val next: Button = view.findViewById(R.id.button5)
-        if(qNumber < questionList.size - 1) {
+        if(qNumber < topics[pos].questions.size - 1) {
             next.text = "Next"
         } else {
             next.text = "Finish"
@@ -102,10 +57,6 @@ class AnswerFragment : Fragment() {
         qNumber = qNumber + 1
 
         val bundler: Bundle = Bundle()
-        bundler.putString("Title", title)
-        bundler.putString("Description", description)
-        bundler.putString("Length", length)
-        bundler.putStringArrayList("QuestionList", questionList)
         bundler.putString("Pos", pos.toString())
         bundler.putInt("aNumber", aNumber)
         bundler.putInt("qNumber", qNumber)
@@ -113,7 +64,7 @@ class AnswerFragment : Fragment() {
         bundler.putIntArray("answerKey", answerKey)
 
         next.setOnClickListener(){
-            if(qNumber < questionList.size) {
+            if(qNumber < topics[pos].questions.size) {
                 (activity as SecondaryActivity).ShowQuestionFragment(bundler)
             } else {
                 (activity as SecondaryActivity).backToStart()
@@ -128,10 +79,6 @@ class AnswerFragment : Fragment() {
             qNumber = qNumber - 1
 
             val bundler: Bundle = Bundle()
-            bundler.putString("Title", title)
-            bundler.putString("Description", description)
-            bundler.putString("Length", length)
-            bundler.putStringArrayList("QuestionList", questionList)
             bundler.putString("Pos", pos.toString())
             bundler.putInt("aNumber", aNumber)
             bundler.putInt("qNumber", qNumber)
