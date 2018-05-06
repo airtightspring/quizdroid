@@ -4,9 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
@@ -14,11 +12,35 @@ import android.widget.TextView
 class MainActivity : AppCompatActivity() {
 
     val app = QuizApp.Companion
-    val topics = app.getTopics()
+
+    var topics = ArrayList<Topic>()
+    var url = ""
+
+    fun onComposeAction(mi: MenuItem) {
+        val intent = Intent(this, Preferences::class.java)
+        startActivity(intent)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.pref, menu)
+        return true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        app.deviceReader()
+
+        if (QuizApp.prefs?.check_url != null) {
+            url = QuizApp.prefs?.check_url.toString()
+        }
+
+
+        topics = app.setup(url)
+
+        setSupportActionBar(findViewById(R.id.my_toolbar))
 
         val listView: ListView = findViewById(R.id.listView)
         listView.adapter = myCustomAdapter(this, topics)
@@ -57,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             val rowMain = layoutInflater.inflate(R.layout.row_main, parent, false)
             val descTextView = rowMain.findViewById<TextView>(R.id.description_textview)
             val current_topic = topic_list[position]
-            descTextView.text = current_topic.shortDesc
+            descTextView.text = current_topic.desc
 
             val nameTextView = rowMain.findViewById<TextView>(R.id.title_textview)
             nameTextView.text = current_topic.title

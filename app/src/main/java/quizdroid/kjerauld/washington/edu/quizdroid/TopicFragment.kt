@@ -40,7 +40,7 @@ class TopicFragment : Fragment() {
         titleBox.text = topics[pos].title
 
         val descriptionBox: TextView = view.findViewById(R.id.textView2)
-        descriptionBox.text = topics[pos].longDesc
+        descriptionBox.text = topics[pos].desc
 
         val lengthBox: TextView = view.findViewById(R.id.textView3)
         val lengthString = topics[pos].questions.size.toString() + " Questions"

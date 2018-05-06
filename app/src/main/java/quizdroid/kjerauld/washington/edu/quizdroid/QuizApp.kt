@@ -1,7 +1,24 @@
 package quizdroid.kjerauld.washington.edu.quizdroid
 
 import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.Environment
 import android.util.Log
+import com.google.gson.annotations.SerializedName
+import okhttp3.*
+import org.json.JSONArray
+import java.io.IOException
+import okhttp3.OkHttpClient
+import java.io.BufferedReader
+import java.io.File
+import java.io.PrintWriter
+
+
+val prefs: Prefs by lazy {
+    QuizApp.prefs!!
+}
+
 
 class QuizApp : Application(), TopicRepository {
 
@@ -11,6 +28,8 @@ class QuizApp : Application(), TopicRepository {
 
         var topicList = ArrayList<Topic>()
 
+        var prefs: Prefs? = null
+
         fun setTopics(input: ArrayList<Topic>) {
             topicList = input
         }
@@ -18,94 +37,149 @@ class QuizApp : Application(), TopicRepository {
         fun getTopics(): ArrayList<Topic> {
             return topicList
         }
+
+        fun setup(given_url: String): ArrayList<Topic> {
+            var url = given_url
+            var my_topics: ArrayList<Topic> = ArrayList<Topic>()
+
+            if(url != "") {
+                var json = ""
+
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                        .url(url)
+                        .build()
+
+                println(Thread.currentThread())
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call?, e: IOException?) {
+                        e?.printStackTrace()
+                    }
+
+                    override fun onResponse(call: Call?, response: Response) {
+                        if (!response.isSuccessful) {
+                            System.err.println("Response not successful")
+                            return
+                        }
+                        json = response.body()!!.string()
+                        val json_data = JSONArray(json)
+
+
+                        for (a in 0..(json_data.length() - 1)) {
+                            val title = json_data.getJSONObject(a).getString("title")
+                            val desc = json_data.getJSONObject(a).getString("desc")
+                            val questions = json_data.getJSONObject(a).getJSONArray("questions")
+
+                            val question_list_data = ArrayList<Question>()
+                            for (i in 0..(questions.length() - 1)) {
+                                val current_question = questions.getJSONObject(i)
+                                val question_title = current_question.getString("text")
+                                val answer = current_question.getInt("answer") - 1
+                                val answers_list = current_question.getJSONArray("answers")
+                                val answer01 = answers_list[0].toString()
+                                val answer02 = answers_list[1].toString()
+                                val answer03 = answers_list[2].toString()
+                                val answer04 = answers_list[3].toString()
+
+                                val answer_list_data: ArrayList<String> = arrayListOf(answer01, answer02, answer03, answer04)
+
+                                val question_object = Question(question_title, answer, answer_list_data)
+
+                                question_list_data.add(question_object)
+                            }
+
+                            val topic_object = Topic(title, desc, question_list_data)
+                            my_topics.add(topic_object)
+                            //topics_holder.add(topic_object)
+                        }
+                    }
+
+                })
+                // Shutdown the executor as soon as the request is handled
+                client.dispatcher().executorService().shutdown()
+
+                Companion.setTopics(my_topics)
+                // } else {
+                //    println("Life Sucks...")
+                // }
+                return my_topics
+            } else {
+                val json = deviceReader()
+                val json_data = JSONArray(json)
+
+                for (a in 0..(json_data.length() - 1)) {
+                    val title = json_data.getJSONObject(a).getString("title")
+                    val desc = json_data.getJSONObject(a).getString("desc")
+                    val questions = json_data.getJSONObject(a).getJSONArray("questions")
+
+                    val question_list_data = ArrayList<Question>()
+                    for (i in 0..(questions.length() - 1)) {
+                        val current_question = questions.getJSONObject(i)
+                        val question_title = current_question.getString("text")
+                        val answer = current_question.getInt("answer") - 1
+                        val answers_list = current_question.getJSONArray("answers")
+                        val answer01 = answers_list[0].toString()
+                        val answer02 = answers_list[1].toString()
+                        val answer03 = answers_list[2].toString()
+                        val answer04 = answers_list[3].toString()
+
+                        val answer_list_data: ArrayList<String> = arrayListOf(answer01, answer02, answer03, answer04)
+
+                        val question_object = Question(question_title, answer, answer_list_data)
+
+                        question_list_data.add(question_object)
+                    }
+
+                    val topic_object = Topic(title, desc, question_list_data)
+                    my_topics.add(topic_object)
+                    //topics_holder.add(topic_object)
+                }
+
+                return my_topics
+            }
+        }
+
+        fun deviceReader(): String {
+            val extStore = Environment.getExternalStorageDirectory().getAbsolutePath()
+            val fileName = "/sdcard/questions.json"
+            val myFile = File(fileName)
+            println(fileName)
+            println(myFile)
+
+            val bufferedReader: BufferedReader = myFile.bufferedReader()
+
+            val inputString = bufferedReader.use { it.readText() }
+            println(inputString)
+            println("DONE")
+
+            return inputString
+        }
+
     }
 
     var topics_holder: ArrayList<Topic> = ArrayList<Topic>()
 
     override fun onCreate() {
+        prefs = Prefs(applicationContext)
         super.onCreate()
         // Required initialization logic here!
 
         Log.i("Startup", "Application Class Initialized")
 
-        val topic02_q01 = Question("Which of the following is not a type of energy?",
-                arrayListOf<String>(
-                        "Kinetic", "Wooden", "Thermal", "Potential"
-                ), 1)
-
-        val topic02_q02 = Question("Which of these is a unit of work?",
-                arrayListOf<String>(
-                        "Watt", "Meter", "Joule", "Newton"
-                ), 2)
-
-        val topic02_q03 = Question("Which of Newton's Laws states that every action has an equal and opposite reaction?",
-                arrayListOf<String>(
-                        "First", "Second", "Third", "Fourth"
-                ), 2)
-
-        val topic02_questions: ArrayList<Question> = arrayListOf(topic02_q01, topic02_q02, topic02_q03)
-
-        val topic01_q01 = Question("What is the derivative of 7x?",
-                arrayListOf<String>(
-                        "3.5x", "7x", "3.5x","7"
-                ), 3)
-
-        val topic01_q02 = Question("What is 9 x 9?",
-                arrayListOf<String>(
-                        "52", "81", "36", "18", "81"
-                ), 1)
-
-        val topic01_q03 = Question("What is 5/1?",
-                arrayListOf<String>(
-                        "5", "1", "10", "42", "5"
-                ), 0)
-
-        val topic01_questions: ArrayList<Question> = arrayListOf(topic01_q01, topic01_q02, topic01_q03)
-
-        val topic03_q01 = Question("Which Hero has the top grossing solo film of all time?",
-                arrayListOf<String>(
-                        "Iron Man", "Captain America", "Black Panther", "Thor"
-                ), 2)
-
-        val topic03_q02 = Question("What is the name of the upcoming Avengers Movie?",
-                arrayListOf<String>(
-                        "Age of Ultron", "War of Thanos", "Battle for Earth", "Infinity War"
-                ), 3)
-
-        val topic03_q03 = Question("Which hero has the power to fly?",
-                arrayListOf<String>(
-                        "Vision", "Hawkeye", "Black Widow", "Captain America"
-                ), 0)
-
-        val topic03_q04 = Question("Where is Black Panther from?",
-                arrayListOf<String>(
-                        "Kenya", "Ethiopia", "Azerbaijan", "Wakanda"
-                ), 3)
-
-
-        val topic03_questions: ArrayList<Question> = arrayListOf(topic03_q01, topic03_q02, topic03_q03, topic03_q04)
-
-        val topic01 = createTopics("Math", "Test your Math Skills", "Take a basic math test" +
-                " to see if you are smarter than a 5th grader!", topic01_questions)
-
-        val topic02 = createTopics("Physics", "Are you a Physics Wizard?", "Take this test to find " +
-                "out if you were made to be a Physics Major!", topic02_questions)
-
-        val topic03 = createTopics("Marvel Super Heroes", "Test Your Wisdom Before Thanos!", "Take this" +
-                " Quiz to find out how much you truly know about the MCU!", topic03_questions)
-
-        val topics: ArrayList<Topic> = arrayListOf<Topic>(topic01, topic02, topic03)
-
-        topics_holder = topics
-        Companion.setTopics(topics)
-
+        var url = ""
+        if (prefs?.check_url != null) {
+            prefs?.check_url = ""
+        }
+        //setup(url)
 
     }
 
-    override fun createTopics(title: String, shortDesc: String, longDesc: String, questions: ArrayList<Question>): Topic {
-        val newTopic: Topic = Topic(title, shortDesc, longDesc, questions)
+    override fun createTopics(title: String, desc: String, longDesc: String, questions: ArrayList<Question>): Topic {
+        val newTopic: Topic = Topic(title, desc, questions)
         return newTopic
     }
+
+
 
     fun getTopics(): ArrayList<Topic> {
         return topics_holder
@@ -113,12 +187,40 @@ class QuizApp : Application(), TopicRepository {
 
 }
 
+
+
 interface TopicRepository {
-    fun createTopics(title: String, shortDesc: String, longDesc: String, questions: ArrayList<Question>): Topic {
-        return Topic(title, shortDesc, longDesc, ArrayList<Question>())
+    fun createTopics(title: String, desc: String, longDesc: String, questions: ArrayList<Question>): Topic {
+        return Topic(title, desc, ArrayList<Question>())
     }
 }
 
-data class Topic(val title: String, val shortDesc: String, val longDesc: String, val questions: ArrayList<Question>)
+data class Topics(
+        @SerializedName("id") val topics_list: ArrayList<Topic>
+)
 
-data class Question(val question: String, val answers: ArrayList<String>, var correctAnswer: Int)
+data class Topic(
+        @SerializedName("title") val title: String,
+        @SerializedName("desc") val desc: String,
+        @SerializedName("questions") val questions: ArrayList<Question>)
+
+data class Question(
+        @SerializedName("text") val text: String,
+        @SerializedName("answer") var answer: Int,
+        @SerializedName("answers") val answers: ArrayList<String>
+)
+
+class Prefs (context: Context) {
+    val PREFS_FILENAME = "quizdroid.kjerauld.washington.edu.quizdroid.prefs"
+    val URL_TITLE = "URL"
+    val CHECK_NUMBER = "Check_Numer"
+    val prefs: SharedPreferences = context.getSharedPreferences(PREFS_FILENAME, 0);
+
+    var check_url: String
+        get() = prefs.getString(URL_TITLE, "")
+        set(value) = prefs.edit().putString(URL_TITLE, value).apply()
+
+    var check_number: Int
+        get() = prefs.getInt(CHECK_NUMBER, 0)
+        set(value) = prefs.edit().putInt(CHECK_NUMBER, value).apply()
+}

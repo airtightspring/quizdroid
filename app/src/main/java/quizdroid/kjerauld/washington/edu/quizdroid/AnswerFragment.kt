@@ -36,13 +36,13 @@ class AnswerFragment : Fragment() {
         val view = inflater?.inflate(R.layout.fragment_answer,
                 container, false) as View
 
-        if (aNumber == topics[pos].questions[qNumber].correctAnswer) {
+        if (aNumber == topics[pos].questions[qNumber].answer) {
             cNumber = cNumber + 1
             answerKey[qNumber] = 1
         }
 
         val yourAnswer: TextView = view.findViewById(R.id.textView5)
-        yourAnswer.text = "Correct Answer: " + topics[pos].questions[qNumber].answers[topics[pos].questions[qNumber].correctAnswer]
+        yourAnswer.text = "Correct Answer: " + topics[pos].questions[qNumber].answers[topics[pos].questions[qNumber].answer]
         val correctAnswer: TextView = view.findViewById(R.id.textView7)
         correctAnswer.text = "Your Answer: " + topics[pos].questions[qNumber].answers[aNumber]
         val correctDisplay: TextView = view.findViewById(R.id.textView6)

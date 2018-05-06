@@ -44,7 +44,7 @@ class QuestionFragment : Fragment() {
         submit.setEnabled(false)
 
         val questionDisplay: TextView = view.findViewById(R.id.textView4)
-        questionDisplay.text = topics[pos].questions[qNumber].question
+        questionDisplay.text = topics[pos].questions[qNumber].text
 
         if(answerKey[qNumber] == 1) {
             cNumber = cNumber - 1
