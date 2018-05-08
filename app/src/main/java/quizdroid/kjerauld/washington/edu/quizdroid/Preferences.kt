@@ -28,7 +28,7 @@ class Preferences : AppCompatActivity() {
         submit.setOnClickListener() {
             if(url.getText().toString() != "" && checker.getText().toString() != "") {
                 val new_url = url.getText().toString()
-                val new_timer: Int = checker.getText().toString().toInt()
+                val new_timer: Int = checker.getText().toString().toDouble().toInt()
                 prefs.check_url = new_url
                 prefs.check_number - new_timer
 
@@ -36,6 +36,11 @@ class Preferences : AppCompatActivity() {
                 startActivity(intent)
             }
 
+        }
+
+        back.setOnClickListener() {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
     }
 }

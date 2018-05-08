@@ -33,6 +33,8 @@ class TopicFragment : Fragment() {
         val view = inflater?.inflate(R.layout.fragment_topic,
         container, false) as View
 
+
+
         answerKey = IntArray(topics[pos].questions.size)
 
         // Inflate the layout for this fragment

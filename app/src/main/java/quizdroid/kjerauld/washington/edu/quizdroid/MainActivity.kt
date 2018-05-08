@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     var topics = ArrayList<Topic>()
     var url = ""
+    var check_number = 0
 
     fun onComposeAction(mi: MenuItem) {
         val intent = Intent(this, Preferences::class.java)
