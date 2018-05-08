@@ -222,11 +222,6 @@ class QuizApp : Application(), TopicRepository {
 
         Log.i("Startup", "Application Class Initialized")
 
-        var url = ""
-        if (prefs?.check_url != null) {
-            prefs?.check_url = ""
-        }
-
 
     }
 

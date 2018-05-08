@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        app.deviceReader()
 
         if (QuizApp.prefs?.check_url != null) {
             url = QuizApp.prefs?.check_url.toString()
