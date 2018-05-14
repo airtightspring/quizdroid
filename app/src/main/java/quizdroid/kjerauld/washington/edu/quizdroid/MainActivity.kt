@@ -8,6 +8,8 @@ import android.view.*
 import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
+import android.net.ConnectivityManager
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     var topics = ArrayList<Topic>()
     var url = ""
     var check_number = 0
+
 
     fun onComposeAction(mi: MenuItem) {
         val intent = Intent(this, Preferences::class.java)
@@ -32,24 +35,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         if (QuizApp.prefs?.check_url != null) {
             url = QuizApp.prefs?.check_url.toString()
         }
 
+        var myContext: Context = this
+        app.setContext(myContext)
 
-        topics = app.setup(url)
+        app.readFile()
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
         val listView: ListView = findViewById(R.id.listView)
-        listView.adapter = myCustomAdapter(this, topics)
+        listView.adapter = myCustomAdapter(this, app.readFile())
 
         listView.setOnItemClickListener{ parent, view, position, id ->
             val intent = Intent(this, SecondaryActivity::class.java)
             intent.putExtra("Pos", position.toString())
             startActivity(intent)
         }
+
+
     }
 
     private class myCustomAdapter(context: Context, topics: ArrayList<Topic>): BaseAdapter() {
@@ -86,6 +92,12 @@ class MainActivity : AppCompatActivity() {
 
             return rowMain
         }
+    }
+
+    fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val activeNetworkInfo = connectivityManager.activeNetworkInfo
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected
     }
 
 }

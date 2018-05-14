@@ -1,5 +1,6 @@
 package quizdroid.kjerauld.washington.edu.quizdroid
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
@@ -18,6 +19,8 @@ class SecondaryActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_secondary)
 
+        var myContext: Context = this
+        app.setContext(myContext)
 
         val pos = intent.getStringExtra("Pos")
 
